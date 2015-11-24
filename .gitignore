@@ -25,3 +25,34 @@ proguard/
 
 # Log Files
 *.log
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+build
+/captures
+
+
+# Intellij project files
+*.iml
+*.ipr
+*.iws
+.idea/
+gen-external-apklibs/
+
+# Crash analytics
+res/values/com_crashlytics_export_strings.xml
+
+#Build
+*/build/*
+*/build/
+**/build/
+**/build/*
+build/*
+
+#Macintosh
+.DS_Store
+
+#gradle
+.gradle/
