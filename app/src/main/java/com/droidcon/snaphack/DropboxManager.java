@@ -104,10 +104,10 @@ public class DropboxManager {
             for (DbxFileInfo info : fileSystem.listFolder(DbxPath.ROOT)) {
                 DbxFile file = null;
                 try {
-                    Log.i(TAG, "Opening file "+info.path.getName());
+                    Log.i(TAG, "Opening file " + info.path.getName());
                     file = fileSystem.open(info.path);
-                    Log.i(TAG, "Opened file "+info.path.getName());
-                    Log.i(TAG, "file "+info.path.getName() + " status: "+file.getSyncStatus().toString());
+                    Log.i(TAG, "Opened file " + info.path.getName());
+                    Log.i(TAG, "file " + info.path.getName() + " status: " + file.getSyncStatus().toString());
                     if (file.getSyncStatus().isCached) {
                         BitmapFactory.Options options = new BitmapFactory.Options();
                         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -156,6 +156,16 @@ public class DropboxManager {
         } catch (DbxException e) {
             Log.e(TAG, "Closing failed: " + e.getLocalizedMessage());
             e.printStackTrace();
+        }
+    }
+
+    public void deleteAll() {
+        try {
+            for (DbxFileInfo info : fileSystem.listFolder(DbxPath.ROOT)) {
+                fileSystem.delete(info.path);
+            }
+        } catch (DbxException e) {
+            Log.e(TAG, "Deleting failed: " + e.getLocalizedMessage());
         }
     }
 }

@@ -36,14 +36,17 @@ public class LoginFragment extends Fragment {
 
     @OnClick(R.id.enter)
     public void onEnter() {
+        enter.setEnabled(false);
         new ServiceManager(getActivity()).login(username.getText().toString(), password.getText().toString().toCharArray(), new Callback<LoginResponse>() {
             @Override
             public void success(LoginResponse loginResponse, Response response) {
+                enter.setEnabled(true);
                 mainActivity.loggedIn();
             }
 
             @Override
             public void failure(RetrofitError error) {
+                enter.setEnabled(true);
                 Snackbar.make(getView(), "Login Failed. " + error.getLocalizedMessage(), Snackbar.LENGTH_LONG);
             }
         });
