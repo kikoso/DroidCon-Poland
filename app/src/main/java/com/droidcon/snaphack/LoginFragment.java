@@ -2,6 +2,7 @@ package com.droidcon.snaphack;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,9 @@ import android.widget.EditText;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class LoginFragment extends Fragment {
 
@@ -31,9 +35,18 @@ public class LoginFragment extends Fragment {
     }
 
     @OnClick(R.id.enter)
-    public void onEnter(){
-        //TODO login to ricky's server
-        mainActivity.loggedIn();
+    public void onEnter() {
+        new ServiceManager(getActivity()).login(username.getText().toString(), password.getText().toString().toCharArray(), new Callback<LoginResponse>() {
+            @Override
+            public void success(LoginResponse loginResponse, Response response) {
+                mainActivity.loggedIn();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Snackbar.make(getView(), "Login Failed. " + error.getLocalizedMessage(), Snackbar.LENGTH_LONG);
+            }
+        });
     }
 
     @Override
