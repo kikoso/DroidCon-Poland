@@ -16,6 +16,16 @@ public class ListFragment extends Fragment {
     private MainActivity mainActivity;
     private PhotoAdapter adapter;
     private DropboxManager dropBoxManager;
+    private DropboxManagerListener dropboxManagerListener = new DropboxManagerListener() {
+        @Override
+        public void onFileSystemChanged() {
+            refresh();
+        }
+    };
+
+    private void refresh() {
+        adapter.setItems(dropBoxManager.getPhotos());
+    }
 
     @InjectView(R.id.grid)
     public GridView gridView;
@@ -37,7 +47,7 @@ public class ListFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         adapter = new PhotoAdapter(getActivity());
-        adapter.setItems(dropBoxManager.getPhotos());
+        refresh();
         gridView.setAdapter(adapter);
     }
 
@@ -50,11 +60,13 @@ public class ListFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
+        dropBoxManager.addListener(dropboxManagerListener);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mainActivity = null;
+        dropBoxManager.removeListener(dropboxManagerListener);
     }
 }
