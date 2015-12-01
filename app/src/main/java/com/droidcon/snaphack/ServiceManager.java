@@ -22,6 +22,11 @@ public class ServiceManager {
     }
 
     public void login(String username, char[] password, final Callback<LoginResponse> callback) {
+        login(username, password.toString(), callback);
+       // login(username, password.toString(), callback);
+    }
+
+    private void login(String username, String password, final Callback<LoginResponse> callback) {
         restService.login(new LoginRequest(username, password), new Callback<LoginResponse>() {
             @Override
             public void success(LoginResponse loginResponse, Response response) {

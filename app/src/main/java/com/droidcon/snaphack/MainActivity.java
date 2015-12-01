@@ -9,6 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
+import com.facebook.crypto.exception.CryptoInitializationException;
+import com.facebook.crypto.exception.KeyChainException;
+
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_LINK_TO_DBX = 43;
@@ -33,6 +38,22 @@ public class MainActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             dropboxManager.savePhoto(imageBitmap);
+
+            FacebookConcealManager manager = new FacebookConcealManager(this);
+            try {
+                manager.savePhoto(imageBitmap, "/my_photo.jpg");
+                manager.savePhotoEncrypted(imageBitmap, "/my_photo_encrypted.jpg");
+                Bitmap decryptedPhoto = manager.decryptPhoto("/my_photo_encrypted.jpg");
+                manager.savePhoto(decryptedPhoto, "/my_photo_encrypted_decrypted.jpg");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (CryptoInitializationException e) {
+                e.printStackTrace();
+            } catch (KeyChainException e) {
+                e.printStackTrace();
+            }
+
+
         }
 
         if (requestCode == REQUEST_LINK_TO_DBX) {
@@ -51,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction().replace(R.id.content_main, new ListFragment()).commit();
     }
 
-    public void takePhoto(){
+    public void takePhoto() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
