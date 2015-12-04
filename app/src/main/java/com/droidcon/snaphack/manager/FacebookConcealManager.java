@@ -1,4 +1,4 @@
-package com.droidcon.snaphack;
+package com.droidcon.snaphack.manager;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,6 +11,7 @@ import com.facebook.crypto.exception.CryptoInitializationException;
 import com.facebook.crypto.exception.KeyChainException;
 import com.facebook.crypto.util.SystemNativeCryptoLibrary;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,18 +23,34 @@ public class FacebookConcealManager {
     private final Crypto crypto;
     private final Entity entity;
 
-    public FacebookConcealManager(Context context) {
-        path = context.getFilesDir().getPath();
+    public FacebookConcealManager(Context context, String path, String password) {
+        this.path = path;
         this.crypto = new Crypto(
                 new SharedPrefsBackedKeyChain(context),
                 new SystemNativeCryptoLibrary());
-        entity = new Entity("nick");
+        entity = new Entity(password);
+        checkPathExists();
+    }
+
+    private void checkPathExists() {
+        File file = new File(path);
+        if(!file.exists())
+        {
+            file.mkdir();
+        }
     }
 
     public void savePhoto(Bitmap imageBitmap, String filename) throws IOException {
         FileOutputStream fileStream = new FileOutputStream(path + filename);
         imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileStream);
         fileStream.close();
+    }
+
+    public Bitmap readPhoto(String filename) throws IOException {
+        FileInputStream fileStream = new FileInputStream(path + filename);
+        Bitmap bitmap = BitmapFactory.decodeStream(fileStream);
+        fileStream.close();
+        return bitmap;
     }
 
     public void savePhotoEncrypted(Bitmap imageBitmap, String filename) throws KeyChainException, CryptoInitializationException, IOException {

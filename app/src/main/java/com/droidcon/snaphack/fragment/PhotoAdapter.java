@@ -1,4 +1,4 @@
-package com.droidcon.snaphack;
+package com.droidcon.snaphack.fragment;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,7 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dropbox.sync.android.DbxFileInfo;
+import com.droidcon.snaphack.R;
+import com.droidcon.snaphack.model.PhotoItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ public class PhotoAdapter extends BaseAdapter {
     private final List<PhotoItem> items = new ArrayList<>();
     private Context context;
 
-    public PhotoAdapter(Context context){
+    public PhotoAdapter(Context context) {
         this.context = context;
     }
 
@@ -51,8 +52,7 @@ public class PhotoAdapter extends BaseAdapter {
 
         PhotoItem photoItem = getItem(i);
         TextView textView1 = (TextView) convertView.findViewById(R.id.textView);
-        DbxFileInfo info = photoItem.getInfo();
-        textView1.setText(info.path.getName());
+        textView1.setText(photoItem.getFilename());
         ImageView imageView = (ImageView) convertView.findViewById(R.id.imageView);
         imageView.setImageBitmap(photoItem.getImage());
         return convertView;

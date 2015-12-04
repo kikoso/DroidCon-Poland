@@ -1,4 +1,4 @@
-package com.droidcon.snaphack;
+package com.droidcon.snaphack.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -8,6 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.droidcon.snaphack.service.LoginResponse;
+import com.droidcon.snaphack.MainActivity;
+import com.droidcon.snaphack.R;
+import com.droidcon.snaphack.service.ServiceManager;
+import com.droidcon.snaphack.manager.KeyManager;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -37,10 +43,12 @@ public class LoginFragment extends Fragment {
     @OnClick(R.id.enter)
     public void onEnter() {
         enter.setEnabled(false);
-        new ServiceManager(getActivity()).login(username.getText().toString(), password.getText().toString().toCharArray(), new Callback<LoginResponse>() {
+        final String usernameString = username.getText().toString();
+        new ServiceManager(getActivity()).login(usernameString, password.getText().toString(), new Callback<LoginResponse>() {
             @Override
             public void success(LoginResponse loginResponse, Response response) {
                 enter.setEnabled(true);
+                new KeyManager(getActivity()).save(loginResponse.getKey() + usernameString);
                 mainActivity.loggedIn();
             }
 

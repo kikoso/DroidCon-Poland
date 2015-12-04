@@ -1,4 +1,4 @@
-package com.droidcon.snaphack;
+package com.droidcon.snaphack.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

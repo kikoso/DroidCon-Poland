@@ -1,7 +1,9 @@
-package com.droidcon.snaphack;
+package com.droidcon.snaphack.service;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.droidcon.snaphack.manager.KeyManager;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -21,12 +23,7 @@ public class ServiceManager {
         restService = restAdapter.create(LoginService.class);
     }
 
-    public void login(String username, char[] password, final Callback<LoginResponse> callback) {
-        login(username, password.toString(), callback);
-       // login(username, password.toString(), callback);
-    }
-
-    private void login(String username, String password, final Callback<LoginResponse> callback) {
+    public void login(String username, String password, final Callback<LoginResponse> callback) {
         restService.login(new LoginRequest(username, password), new Callback<LoginResponse>() {
             @Override
             public void success(LoginResponse loginResponse, Response response) {

@@ -1,4 +1,4 @@
-package com.droidcon.snaphack;
+package com.droidcon.snaphack.manager;
 
 import android.content.Context;
 import android.content.SharedPreferences;

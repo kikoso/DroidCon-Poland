@@ -1,14 +1,16 @@
 package com.droidcon.snaphack;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
+import com.droidcon.snaphack.fragment.LoginFragment;
+import com.droidcon.snaphack.fragment.PhotoListFragment;
+import com.droidcon.snaphack.manager.FacebookConcealManager;
+import com.droidcon.snaphack.manager.KeyManager;
 import com.facebook.crypto.exception.CryptoInitializationException;
 import com.facebook.crypto.exception.KeyChainException;
 
@@ -18,8 +20,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_LINK_TO_DBX = 43;
     private static final int REQUEST_IMAGE_CAPTURE = 234;
+    private static final int REQUEST_IMAGE_CAPTURE_ENCRYPTED = 2344;
     private static final String TAG = "SnapHack";
-    private DropboxManager dropboxManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,55 +29,57 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getFragmentManager().beginTransaction().replace(R.id.content_main, new LoginFragment()).commit();
-        dropboxManager = ShApplication.getInstance().getDropboxManager();
-        dropboxManager.startLink(this, REQUEST_LINK_TO_DBX);
+        getFragmentManager().beginTransaction().add(R.id.content_main, new LoginFragment()).addToBackStack(null).commit();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            dropboxManager.savePhoto(imageBitmap);
 
-            FacebookConcealManager manager = new FacebookConcealManager(this);
+            String fileName = System.currentTimeMillis() + "_photo";
+
+            FacebookConcealManager externalFileManager = new FacebookConcealManager(this, ShApplication.getInstance().getConfiguredStorageDirectory(), new KeyManager(this).read());
             try {
-                manager.savePhoto(imageBitmap, "/my_photo.jpg");
-                manager.savePhotoEncrypted(imageBitmap, "/my_photo_encrypted.jpg");
-                Bitmap decryptedPhoto = manager.decryptPhoto("/my_photo_encrypted.jpg");
-                manager.savePhoto(decryptedPhoto, "/my_photo_encrypted_decrypted.jpg");
+                if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                    externalFileManager.savePhoto(imageBitmap, fileName + ".jpg");
+                }
+                if (requestCode == REQUEST_IMAGE_CAPTURE_ENCRYPTED) {
+                    externalFileManager.savePhotoEncrypted(imageBitmap, fileName + "_encrypted.jpg");
+                }
             } catch (IOException e) {
-                e.printStackTrace();
             } catch (CryptoInitializationException e) {
-                e.printStackTrace();
             } catch (KeyChainException e) {
-                e.printStackTrace();
             }
-
-
-        }
-
-        if (requestCode == REQUEST_LINK_TO_DBX) {
-            if (resultCode == Activity.RESULT_OK) {
-                Log.d(TAG, "We're good");
-                dropboxManager.initialise();
-            } else {
-                Log.e(TAG, "Can't link to Dropbox");
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
     public void loggedIn() {
-        getFragmentManager().beginTransaction().replace(R.id.content_main, new ListFragment()).commit();
+        getFragmentManager().beginTransaction().add(R.id.content_main, new PhotoListFragment()).addToBackStack(null).commit();
     }
 
     public void takePhoto() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    public void takePhotoEncrypted() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE_ENCRYPTED);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        int  count = getFragmentManager().getBackStackEntryCount();
+        if (count > 1) {
+            getFragmentManager().popBackStackImmediate();
+        }else{
+            super.onBackPressed();
         }
     }
 }

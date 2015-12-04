@@ -1,4 +1,4 @@
-package com.droidcon.snaphack;
+package com.droidcon.snaphack.service;
 
 import retrofit.Callback;
 import retrofit.http.Body;

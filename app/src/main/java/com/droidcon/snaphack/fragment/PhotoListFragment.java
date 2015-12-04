@@ -1,4 +1,4 @@
-package com.droidcon.snaphack;
+package com.droidcon.snaphack.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -9,34 +9,40 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.TextView;
+
+import com.droidcon.snaphack.MainActivity;
+import com.droidcon.snaphack.R;
+import com.droidcon.snaphack.manager.FileManager;
+import com.droidcon.snaphack.model.PhotoItem;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class ListFragment extends Fragment {
+public class PhotoListFragment extends Fragment {
 
     private MainActivity mainActivity;
     private PhotoAdapter adapter;
-    private DropboxManager dropBoxManager;
-    private DropboxManagerListener dropboxManagerListener = new DropboxManagerListener() {
-        @Override
-        public void onFileSystemChanged() {
-            refresh();
-        }
-    };
 
     private void refresh() {
-        adapter.setItems(dropBoxManager.getPhotos());
+        List<PhotoItem> items = new FileManager(getActivity()).getAll();
+        boolean containsItems = (items.size() > 0);
+        emptyText.setVisibility(!containsItems ? View.VISIBLE : View.GONE);
+        adapter.setItems(items);
     }
 
     @InjectView(R.id.grid)
     public GridView gridView;
 
+    @InjectView(R.id.emptyText)
+    public TextView emptyText;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dropBoxManager = ShApplication.getInstance().getDropboxManager();
         setHasOptionsMenu(true);
     }
 
@@ -49,7 +55,11 @@ public class ListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_delete:
-                dropBoxManager.deleteAll();
+                new FileManager(getActivity()).deleteAll();
+                refresh();
+                return true;
+            case R.id.action_refresh:
+                refresh();
                 return true;
             default:
                 break;
@@ -77,17 +87,21 @@ public class ListFragment extends Fragment {
         mainActivity.takePhoto();
     }
 
+    @OnClick(R.id.photo_encrypted)
+    public void onTakePhotoEncrypted() {
+        mainActivity.takePhotoEncrypted();
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
-        dropBoxManager.addListener(dropboxManagerListener);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mainActivity = null;
-        dropBoxManager.removeListener(dropboxManagerListener);
     }
+
 }

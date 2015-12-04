@@ -1,14 +1,9 @@
 package com.droidcon.snaphack;
 
 import android.app.Application;
+import android.os.Environment;
 
 public class ShApplication extends Application {
-    private DropboxManager dropboxManager;
-
-    public DropboxManager getDropboxManager() {
-        return dropboxManager;
-    }
-
     private static ShApplication instance;
 
     public static ShApplication getInstance() {
@@ -19,6 +14,9 @@ public class ShApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        dropboxManager = new DropboxManager(getApplicationContext());
+    }
+
+    public String getConfiguredStorageDirectory() {
+        return Environment.getExternalStorageDirectory().getPath() + "/SnapHack/";
     }
 }
