@@ -9,7 +9,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.droidcon.snaphack.fragment.LoginFragment;
 import com.droidcon.snaphack.fragment.PhotoListFragment;
-import com.droidcon.snaphack.manager.FacebookConcealManager;
+import com.droidcon.snaphack.manager.CryptoManager;
 import com.droidcon.snaphack.manager.KeyManager;
 import com.facebook.crypto.exception.CryptoInitializationException;
 import com.facebook.crypto.exception.KeyChainException;
@@ -18,10 +18,8 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int REQUEST_LINK_TO_DBX = 43;
     private static final int REQUEST_IMAGE_CAPTURE = 234;
     private static final int REQUEST_IMAGE_CAPTURE_ENCRYPTED = 2344;
-    private static final String TAG = "SnapHack";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
             String fileName = System.currentTimeMillis() + "_photo";
 
-            FacebookConcealManager externalFileManager = new FacebookConcealManager(this, ShApplication.getInstance().getConfiguredStorageDirectory(), new KeyManager(this).read());
+            CryptoManager externalFileManager = new CryptoManager(this, ShApplication.getInstance().getConfiguredStorageDirectory(), new KeyManager(this).read());
             try {
                 if (requestCode == REQUEST_IMAGE_CAPTURE) {
                     externalFileManager.savePhoto(imageBitmap, fileName + ".jpg");

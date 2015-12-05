@@ -18,12 +18,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class FacebookConcealManager {
+public class CryptoManager {
     private final String path;
     private final Crypto crypto;
     private final Entity entity;
 
-    public FacebookConcealManager(Context context, String path, String password) {
+    public CryptoManager(Context context, String path, String password) {
         this.path = path;
         this.crypto = new Crypto(
                 new SharedPrefsBackedKeyChain(context),

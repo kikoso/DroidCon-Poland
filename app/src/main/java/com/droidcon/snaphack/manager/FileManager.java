@@ -43,7 +43,7 @@ public class FileManager {
             return photos;
         }
 
-        FacebookConcealManager manager = new FacebookConcealManager(context, ShApplication.getInstance().getConfiguredStorageDirectory(), new KeyManager(context).read());
+        CryptoManager manager = new CryptoManager(context, ShApplication.getInstance().getConfiguredStorageDirectory(), new KeyManager(context).read());
         for (String file : files) {
             PhotoItem photo = null;
             photo = tryToGetAdecryptedPhoto(manager, file);
@@ -57,7 +57,7 @@ public class FileManager {
         return photos;
     }
 
-    private PhotoItem tryToGetANormalPhoto(FacebookConcealManager manager, String file) {
+    private PhotoItem tryToGetANormalPhoto(CryptoManager manager, String file) {
         try {
             Bitmap bitmap = manager.readPhoto(file);
             if (bitmap == null) {
@@ -71,7 +71,7 @@ public class FileManager {
     }
 
     @NonNull
-    private PhotoItem tryToGetAdecryptedPhoto(FacebookConcealManager manager, String file) {
+    private PhotoItem tryToGetAdecryptedPhoto(CryptoManager manager, String file) {
         try {
             Bitmap decryptedFile = manager.decryptPhoto(file);
             if (decryptedFile == null) {
